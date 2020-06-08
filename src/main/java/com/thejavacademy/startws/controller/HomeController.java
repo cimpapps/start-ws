@@ -1,5 +1,6 @@
 package com.thejavacademy.startws.controller;
 
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -9,4 +10,11 @@ public class HomeController {
     public String home() {
         return "index.html";
     }
+
+    @MessageMapping("/chat")
+    public String chat(String message) {
+        return message.toUpperCase();
+    }
+
+
 }
