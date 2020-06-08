@@ -1,0 +1,38 @@
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+
+<input id="messageInput" type="text">
+<button id="submitButton" onclick="sendMessage()">SEND MESSAGE</button>
+<br/>
+
+<ul id="chat">
+    <li>CHAT HERE</li>
+</ul>
+
+<script>
+    document.cookie="user-name=alin"
+    var ws = new WebSocket("ws://localhost:8080/chat");
+    ws.onopen = function () {
+        ws.send("Hello Server!")
+    }
+
+    ws.onmessage = function (event) {
+        $("#chat").append('<li>' + event.data + '</li>');
+    }
+
+    ws.onclose = function (event) {
+        console.log(event);
+    }
+
+    function sendMessage() {
+        ws.send($("#messageInput").val())
+    }
+
+</script>
+
+</body>
+
+</html>
