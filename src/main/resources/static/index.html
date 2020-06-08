@@ -2,11 +2,15 @@
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script></head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
+</head>
 <body>
 
 <input id="messageInput" type="text">
 <button id="submitButton" onclick="sendMessage()">SEND MESSAGE</button>
+<br/>
+<input id="userInput" type="text">
+<button id="privateSubmit" onclick="sendPrivateMessage()">SEND PRIVATE</button>
 <br/>
 
 <ul id="chat">
@@ -23,10 +27,29 @@
         }, function (err) {
             console.log(err);
         });
+
+        stompClient.connect({}, function (frame) {
+            stompClient.subscribe("/topic/chat", function (message) {
+                $("#chat").append("<li>" + message.body + "</li>");
+            }, function (err) {
+                console.log(err);
+            });
+
+        stompClient.subscribe("/user/queue/private", function (message) {
+            $("#chat").append("<li>" + message.body + "</li>");
+        }, function (err) {
+            console.log(err);
+        });
+
+
     });
 
     function sendMessage() {
         stompClient.send("/app-chat/chat", {}, $("#messageInput").val())
+    }
+
+    function sendPrivateMessage() {
+        stompClient.send("/user/" + $("#userInput").val() +   "/queue/private", {}, $("#messageInput").val())
     }
 
 </script>
