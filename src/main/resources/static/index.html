@@ -1,7 +1,8 @@
 <html>
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-</head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script></head>
 <body>
 
 <input id="messageInput" type="text">
@@ -13,22 +14,19 @@
 </ul>
 
 <script>
-    document.cookie="user-name=alin"
-    var ws = new WebSocket("ws://localhost:8080/chat");
-    ws.onopen = function () {
-        ws.send("Hello Server!")
-    }
+    var ws = new SockJS("/chat");
+    var stompClient = Stomp.over(ws);
 
-    ws.onmessage = function (event) {
-        $("#chat").append('<li>' + event.data + '</li>');
-    }
-
-    ws.onclose = function (event) {
-        console.log(event);
-    }
+    stompClient.connect({}, function (frame) {
+        stompClient.subscribe("/topic/c", function (message) {
+            $("#chat").append("<li>" + message.body + "</li>");
+        }, function (err) {
+            console.log(err);
+        });
+    });
 
     function sendMessage() {
-        ws.send($("#messageInput").val())
+        stompClient.send("/topic/c", {}, $("#messageInput").val())
     }
 
 </script>
